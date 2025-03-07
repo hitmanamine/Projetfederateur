@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: monitoring-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: general.rules
+    rules:
+    - alert: HighCPUUsage
+      expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Utilisation CPU élevée"
+        description: "L'instance {{ $labels.instance }} a une utilisation CPU > 80%."
+
+    - alert: LowMemory
+      expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Mémoire faible"
+        description: "L'instance {{ $labels.instance }} a moins de 10% de mémoire disponible."
+
+    - alert: PodCrashLoop
+      expr: kube_pod_container_status_restarts_total > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Pod en crash"
+        description: "Le pod {{ $labels.pod }} a redémarré plus de 5 fois."

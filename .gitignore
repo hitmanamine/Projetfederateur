@@ -1,0 +1,15 @@
+Projet-K8s/
+jupyterhub.old/
+jupyterhub/
+.ansible/
+.aws/
+.azure/
+.cache/
+.config/
+.docker/
+.kube/
+.local/
+.minikube/
+.ssh/
+.terraform.d/
+.snap/

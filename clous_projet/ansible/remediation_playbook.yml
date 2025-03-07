@@ -1,0 +1,75 @@
+---
+- name: Manage Apache2 service
+  hosts: local
+  become: true
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+      tags: install
+
+    - name: Check if Apache is running
+      shell: systemctl is-active apache2
+      register: apache_status
+      ignore_errors: true
+
+    - name: Notify if Apache is running
+      debug:
+        msg: "Apache service is already running."
+      when: apache_status.stdout == "active"
+
+    - name: Restart Apache if not running
+      service:
+        name: apache2
+        state: restarted
+      when: apache_status.stdout != "active"
+      register: restart_result
+      ignore_errors: true
+
+    - name: Notify if Apache was successfully restarted
+      debug:
+        msg: "Apache service was successfully restarted."
+      when: restart_result is success
+
+    - name: Notify if Apache failed to restart
+      debug:
+        msg: "Failed to restart Apache service. Please check logs for details."
+      when: restart_result is failed
+
+    # Si tu veux envoyer un mail, voici la version avec le module `mail`
+    - name: Notify if Apache is running (Mail)
+      mail:
+        to: "mohamed_amine_hosny@hotmail.com"
+        subject: "Apache service is running"
+        body: "Apache service is already running."
+        smtp_host: "smtp-mail.outlook.com"
+        smtp_port: 587
+        smtp_user: "mohamed_amine_hosny@hotmail.com"
+        smtp_password: "TuHosny2421178"
+        tls: yes
+      when: apache_status.stdout == "active"
+
+    - name: Notify if Apache was successfully restarted (Mail)
+      mail:
+        to: "mohamed_amine_hosny@hotmail.com"
+        subject: "Apache service restarted successfully"
+        body: "Apache service was successfully restarted."
+        smtp_host: "smtp-mail.outlook.com"
+        smtp_port: 587
+        smtp_user: "mohamed_amine_hosny@hotmail.com"
+        smtp_password: "TuHosny2421178"
+        tls: yes
+      when: restart_result is success
+
+    - name: Notify if Apache failed to restart (Mail)
+      mail:
+        to: "mohamed_amine_hosny@hotmail.com"
+        subject: "Failed to restart Apache service"
+        body: "Failed to restart Apache service. Please check logs for details."
+        smtp_host: "smtp-mail.outlook.com"
+        smtp_port: 587
+        smtp_user: "mohamed_amine_hosny@hotmail.com"
+        smtp_password: "TuHosny2421178"
+        tls: yes
+      when: restart_result is failed

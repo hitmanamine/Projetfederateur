@@ -1,0 +1,55 @@
+version: '3.6'
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.10.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - thehive_network
+
+  thehive:
+    image: thehiveproject/thehive:latest  # Changed from 5.2.0 to latest
+    container_name: thehive
+    depends_on:
+      - elasticsearch
+    environment:
+      - CORTEX_URL=http://localhost:9001/
+      - CORTEX_KEY=A7ufXrxzc7hwHRSCPGIj5eVID5sOGlX0
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    volumes:
+      - thehive_data:/opt/thp_data
+    ports:
+      - "9000:9000"
+    networks:
+      - thehive_network
+
+  cortex:
+    image: thehiveproject/cortex:latest
+    container_name: cortex
+    environment:
+      - CORTEX_SECRET=dQZqksfXvjfTkKyOg8Rkq8mMdy0gZpMw2Sz9KmOjEmw=
+      - CORTEX_KEY=A7ufXrxzc7hwHRSCPGIj5eVID5sOGlX0
+      - CORTEX_URL=http://localhost:9001/
+    volumes:
+      - cortex_data:/opt/cortex_data
+    ports:
+      - "9001:9001"
+    networks:
+      - thehive_network
+
+volumes:
+  elasticsearch_data:
+  thehive_data:
+  cortex_data:
+
+networks:
+  thehive_network:
+    driver: bridge
+

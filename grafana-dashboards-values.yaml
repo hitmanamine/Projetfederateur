@@ -1,0 +1,15 @@
+grafana:
+  dashboards:
+    default:
+      kubernetes-cluster:
+        gnetId: 3119
+        revision: 1
+        datasource: Prometheus
+      node-exporter:
+        gnetId: 1860
+        revision: 12
+        datasource: Prometheus
+      kube-state-metrics:
+        gnetId: 13332
+        revision: 1
+        datasource: Prometheus
