@@ -5,7 +5,6 @@ metadata:
   namespace: monitoring
 spec:
   groups:
-    # Groupe pour les alertes générales
     - name: Pgeneral.rules
       rules:
         - alert: HighCPUUsage
@@ -35,7 +34,6 @@ spec:
             summary: "Pod en crash"
             description: "Le pod {{ $labels.pod }} a redémarré plus de 5 fois."
 
-    # Groupe pour les alertes de test
     - name: test_alerts
       rules:
         - alert: TestAlerte
@@ -45,4 +43,3 @@ spec:
             severity: "info"
           annotations:
             summary: "Alerte de Test pour {{ $labels.instance }}"
-            description: "Ceci est une alerte de test. Date: {{ `{{` }} .StartsAt | date `2006-01-02 15:04:05` {{ `}}` }}"
