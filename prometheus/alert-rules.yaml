@@ -1,0 +1,11 @@
+groups:
+  - name: test_alerts
+    rules:
+      - alert: TestAlerte
+        expr: vector(1)  # Cette expression déclenche toujours l’alerte (pour tester)
+        for: 1m
+        labels:
+          severity: "info"
+        annotations:
+          summary: "Alerte de Test pour {{ $labels.instance }}"
+          description: "Bienvenue au projet federateur Amine et dali  ! Date: {{ `{{` }} .StartsAt | date `2006-01-02 15:04:05` {{ `}}` }}"
