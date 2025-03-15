@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: my-custom-rules
+  namespace: monitoring
+  labels:
+    release: prometheus  # Ce label doit correspondre à la release Helm de votre Prometheus
+spec:
+  groups:
+  - name: my-custom-rules
+    rules:
+    - alert: MyCustomAlert
+      expr: up == 0  # Exemple d'expression PromQL
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Service is down"
+        description: "The service {{ $labels.instance }} is down."

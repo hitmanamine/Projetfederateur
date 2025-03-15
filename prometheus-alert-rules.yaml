@@ -1,3 +1,4 @@
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -5,6 +6,7 @@ metadata:
   namespace: monitoring
 spec:
   groups:
+    # Groupe pour les alertes générales
     - name: Pgeneral.rules
       rules:
         - alert: HighCPUUsage
@@ -34,6 +36,7 @@ spec:
             summary: "Pod en crash"
             description: "Le pod {{ $labels.pod }} a redémarré plus de 5 fois."
 
+    # Groupe pour les alertes de test
     - name: test_alerts
       rules:
         - alert: TestAlerte

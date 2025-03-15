@@ -1,7 +1,10 @@
-name: Deploy to Minikube
+name: Deploy Helm Chart
 
 on:
   push:
+    branches:
+      - main  # Déclenche le workflow quand on push sur main
+  pull_request:
     branches:
       - main
 
@@ -10,26 +13,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Minikube
-        run: |
-          # Installer Minikube
-          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-          sudo chmod +x minikube
-          sudo mv minikube /usr/local/bin/
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-          # Lancer Minikube avec Docker comme driver
-          minikube start --driver=docker
+    - name: Set up Kubernetes
+      uses: azure/setup-kubectl@v3
+      with:
+        version: v1.25.0
 
-      - name: Set up Helm
-        run: |
-          # Installer Helm
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    - name: Configure Kubeconfig
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > kubeconfig
+        export KUBECONFIG=kubeconfig
 
-      - name: Deploy with Helm
-        run: |
-          # Déployer Prometheus avec Helm
-          kubectl create namespace monitoring || true
-          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+    - name: Add Helm repo and update
+      run: |
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+
+    - name: Deploy Prometheus with Helm
+      run: |
+        kubectl create namespace monitoring || true
+        helm upgrade --install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace

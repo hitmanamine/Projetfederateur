@@ -1,0 +1,6 @@
+server:
+  extraScrapeConfigs:
+    - job_name: 'my-alerts'
+      file_sd_configs:
+        - files:
+            - /etc/prometheus/rules/alert-rules.yaml
